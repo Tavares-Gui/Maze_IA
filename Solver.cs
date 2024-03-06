@@ -129,8 +129,8 @@ public class Solver
         var dist = new Dictionary<Space, float>();
         var prev = new Dictionary<Space, Space>();
 
-        queue.Enqueue(start, 0.0f);
-        dist[start] = 0.0f;
+        queue.Enqueue(space, 0.0f);
+        dist[space] = 0.0f;
 
         while (queue.Count > 0)
         {
@@ -172,7 +172,7 @@ public class Solver
         }
 
         var attempt = goal;
-        while (attempt != start)
+        while (attempt != space)
         {
             if (!prev.ContainsKey(attempt))
                 return false;
@@ -184,14 +184,14 @@ public class Solver
         return true;
     }
 
-     private static bool AStar(Space start, Space goal)
+    private static bool AStar(Space space, Space goal)
     {
         var queue = new PriorityQueue<Space, float>();
         var dist = new Dictionary<Space, float>();
         var prev = new Dictionary<Space, Space>();
 
-        queue.Enqueue(start, 0.0f);
-        dist[start] = 0.0f;
+        queue.Enqueue(space, 0.0f);
+        dist[space] = 0.0f;
 
         while (queue.Count > 0)
         {
@@ -236,7 +236,7 @@ public class Solver
         }
 
         var attempt = goal;
-        while (attempt != start)
+        while (attempt != space)
         {
             if (!prev.ContainsKey(attempt))
                 return false;
