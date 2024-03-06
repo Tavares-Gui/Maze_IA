@@ -36,7 +36,7 @@ public class Solver
                 Dijkstra(Maze.Root, goal);
                 break;
             case 3:
-                aStar(Maze.Root, goal);
+                AStar(Maze.Root, goal);
                 break;
         }
     }
@@ -129,98 +129,50 @@ public class Solver
         var dist = new Dictionary<Space, float>();
         var prev = new Dictionary<Space, Space>();
 
-        queue.Enqueue(space, 0.0f);
-        dist[space] = 0.0f;
+        queue.Enqueue(start, 0.0f);
+        dist[start] = 0.0f;
 
         while (queue.Count > 0)
         {
             var currNode = queue.Dequeue();
             if (currNode == goal)
                 break;
-
-            var edge = currNode;
+            List<Space> edges = new();
 
             if (currNode.Bottom is not null)
-            {
-                edge = currNode.Bottom;
-                currNode.Bottom.Visited = true;
-
-                var newWeight = dist[currNode] + 1;
-                if (!dist.ContainsKey(edge))
-                {
-                    dist[edge] = float.PositiveInfinity;
-                    prev[edge] = null!;
-                }
-
-                if (newWeight < dist[edge])
-                {
-                    dist[edge] = newWeight;
-                    prev[edge] = currNode;
-                    queue.Enqueue(edge, newWeight);
-                }
-            }
-
+                edges.Add(currNode.Bottom);
             if (currNode.Top is not null)
-            {
-                edge = currNode.Top;
-                currNode.Top.Visited = true;
-
-                var newWeight = dist[currNode] + 1;
-                if (!dist.ContainsKey(edge))
-                {
-                    dist[edge] = float.PositiveInfinity;
-                    prev[edge] = null!;
-                }
-
-                if (newWeight < dist[edge])
-                {
-                    dist[edge] = newWeight;
-                    prev[edge] = currNode;
-                    queue.Enqueue(edge, newWeight);
-                }
-            }
-
+                edges.Add(currNode.Top);
             if (currNode.Left is not null)
-            {
-                edge = currNode.Left;
-                edge.Visited = true;
-                var newWeight = dist[currNode] + 1;
-                if (!dist.ContainsKey(edge))
-                {
-                    dist[edge] = float.PositiveInfinity;
-                    prev[edge] = null!;
-                }
-
-                if (newWeight < dist[edge])
-                {
-                    dist[edge] = newWeight;
-                    prev[edge] = currNode;
-                    queue.Enqueue(edge, newWeight);
-                }
-            }
-
+                edges.Add(currNode.Left);
             if (currNode.Right is not null)
-            {
-                edge = currNode.Right;
-                edge.Visited = true;
-                var newWeight = dist[currNode] + 1;
-                if (!dist.ContainsKey(edge))
-                {
-                    dist[edge] = float.PositiveInfinity;
-                    prev[edge] = null!;
-                }
+                edges.Add(currNode.Right);
 
-                if (newWeight < dist[edge])
+            foreach (var edge in edges)
+            {
+                if (edge is not null)
                 {
-                    dist[edge] = newWeight;
-                    prev[edge] = currNode;
-                    queue.Enqueue(edge, newWeight);
+                    edge.Visited = true;
+                    var newWeight = dist[currNode] + 1;
+
+                    if (!dist.ContainsKey(edge))
+                    {
+                        dist[edge] = float.PositiveInfinity;
+                        prev[edge] = null!;
+                    }
+
+                    if (newWeight < dist[edge])
+                    {
+                        dist[edge] = newWeight;
+                        prev[edge] = currNode;
+                        queue.Enqueue(edge, newWeight);
+                    }
                 }
             }
         }
 
         var attempt = goal;
-        while (attempt != space)
+        while (attempt != start)
         {
             if (!prev.ContainsKey(attempt))
                 return false;
@@ -228,13 +180,71 @@ public class Solver
             attempt.IsSolution = true;
             attempt = prev[attempt];
         }
-        attempt.IsSolution = true;
 
         return true;
     }
 
-    private static bool aStar(Space space, Space goal)
+     private static bool AStar(Space start, Space goal)
     {
+        var queue = new PriorityQueue<Space, float>();
+        var dist = new Dictionary<Space, float>();
+        var prev = new Dictionary<Space, Space>();
+
+        queue.Enqueue(start, 0.0f);
+        dist[start] = 0.0f;
+
+        while (queue.Count > 0)
+        {
+            var currNode = queue.Dequeue();
+            if (currNode == goal)
+                break;
+
+            List<Space> edges = new();
+
+            if (currNode.Bottom is not null)
+                edges.Add(currNode.Bottom);
+            if (currNode.Top is not null)
+                edges.Add(currNode.Top);
+            if (currNode.Left is not null)
+                edges.Add(currNode.Left);
+            if (currNode.Right is not null)
+                edges.Add(currNode.Right);
+
+            foreach (var edge in edges)
+            {
+                if (edge is not null)
+                {
+                    edge.Visited = true;
+
+                    float hip = (float)(Math.Pow(Math.Abs(currNode.X - goal.X), 2) + Math.Pow(Math.Abs(currNode.Y - goal.Y), 2));
+                    var newWeight = dist[currNode] + hip;
+
+                    if (!dist.ContainsKey(edge))
+                    {
+                        dist[edge] = float.PositiveInfinity;
+                        prev[edge] = null!;
+                    }
+
+                    if (newWeight < dist[edge])
+                    {
+                        dist[edge] = newWeight;
+                        prev[edge] = currNode;
+                        queue.Enqueue(edge, newWeight);
+                    }
+                }
+            }
+        }
+
+        var attempt = goal;
+        while (attempt != start)
+        {
+            if (!prev.ContainsKey(attempt))
+                return false;
+
+            attempt.IsSolution = true;
+            attempt = prev[attempt];
+        }
+
         return true;
     }
 }
