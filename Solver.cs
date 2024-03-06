@@ -65,6 +65,8 @@ public class Solver
     private static bool BFS(Space space, Space goal)
     {
         var queue = new Queue<Space>();
+        var prev = new Dictionary<Space, Space>();
+
         queue.Enqueue(space);
 
         while (queue.Count > 0)
@@ -79,46 +81,56 @@ public class Solver
             if (EqualityComparer<Space>.Default.Equals(currNode, goal))
             {
                 currNode.IsSolution = true;
-                return true;
+                break;
             }
 
 
-            if (currNode.Left is not null)
+            if (currNode.Left is not null && !prev.ContainsKey(currNode.Left))
             {
-                currNode.Left.IsSolution = true;
+                prev[currNode.Left] = currNode;
                 queue.Enqueue(currNode.Left);
             }
 
-            if (currNode.Top is not null)
+            if (currNode.Top is not null && !prev.ContainsKey(currNode.Top))
             {
-                currNode.Top.IsSolution = true;
+                prev[currNode.Top] = currNode;
                 queue.Enqueue(currNode.Top);
             }
 
-            if (currNode.Right is not null)
+            if (currNode.Right is not null && !prev.ContainsKey(currNode.Right))
             {
-                currNode.Right.IsSolution = true;
+                prev[currNode.Right] = currNode;
                 queue.Enqueue(currNode.Right);
             }
 
-            if (currNode.Bottom is not null)
+            if (currNode.Bottom is not null && !prev.ContainsKey(currNode.Bottom))
             {
-                currNode.Bottom.IsSolution = true;
+                prev[currNode.Bottom] = currNode;
                 queue.Enqueue(currNode.Bottom);
             }
+        }
+
+        var attempt = goal;
+        while (attempt != space)
+        {
+            if (!prev.ContainsKey(attempt))
+                return false;
+
+            attempt.IsSolution = true;
+            attempt = prev[attempt];
         }
 
         return false;
     }
 
-    private static bool Dijkstra(Space start, Space goal)
+    private static bool Dijkstra(Space space, Space goal)
     {
         var queue = new PriorityQueue<Space, float>();
         var dist = new Dictionary<Space, float>();
         var prev = new Dictionary<Space, Space>();
 
-        queue.Enqueue(start, 0.0f);
-        dist[start] = 0.0f;
+        queue.Enqueue(space, 0.0f);
+        dist[space] = 0.0f;
 
         while (queue.Count > 0)
         {
@@ -208,7 +220,7 @@ public class Solver
         }
 
         var attempt = goal;
-        while (attempt != start)
+        while (attempt != space)
         {
             if (!prev.ContainsKey(attempt))
                 return false;
