@@ -212,6 +212,7 @@ public class Solver
         {
             if (!prev.ContainsKey(attempt))
                 return false;
+                
 
             attempt.IsSolution = true;
             attempt = prev[attempt];
