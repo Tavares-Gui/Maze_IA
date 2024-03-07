@@ -42,7 +42,7 @@ public class Solver
     }
 
     private static bool DFS(Space space, Space goal)
-    {   
+    {
         if (space.Visited)
             return false;
 
@@ -216,7 +216,7 @@ public class Solver
                 {
                     edge.Visited = true;
 
-                    float penalty = (float)(Math.Pow(Math.Abs(currNode.X - goal.X), 2) + Math.Pow(Math.Abs(currNode.Y - goal.Y), 2));
+                    float penalty = MathF.Sqrt((float)(Math.Pow(Math.Abs(currNode.X - goal.X), 2) + Math.Pow(Math.Abs(currNode.Y - goal.Y), 2)));
                     var newWeight = dist[currNode] + 1 + penalty;
 
                     if (!dist.ContainsKey(edge))
@@ -225,12 +225,12 @@ public class Solver
                         prev[edge] = null!;
                     }
 
-                    if (newWeight < dist[edge])
-                    {
-                        dist[edge] = newWeight;
-                        prev[edge] = currNode;
-                        queue.Enqueue(edge, newWeight);
-                    }
+                    if (newWeight > dist[edge])
+                        continue;
+
+                    dist[edge] = newWeight;
+                    prev[edge] = currNode;
+                    queue.Enqueue(edge, newWeight);
                 }
             }
         }
