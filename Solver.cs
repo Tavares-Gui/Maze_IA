@@ -217,7 +217,7 @@ public class Solver
                     edge.Visited = true;
 
                     float penalty = (float)(Math.Pow(Math.Abs(currNode.X - goal.X), 2) + Math.Pow(Math.Abs(currNode.Y - goal.Y), 2));
-                    var newWeight = dist[currNode] + penalty;
+                    var newWeight = dist[currNode] + 1 + penalty;
 
                     if (!dist.ContainsKey(edge))
                     {
